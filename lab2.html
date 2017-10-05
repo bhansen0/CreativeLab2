@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<style>
+
+		</style>
+		
+		<title>Creative Lab - 2</title>
+		
+		<script
+			src="http://code.jquery.com/jquery-3.2.1.min.js"
+  			integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  			crossorigin="anonymous">
+		</script>
+		
+		<script>
+			$(document).ready(function() {
+				$("#searchButton").click(function(e) {
+					var streetValue = $("#streetInput").val();
+					var cityValue = $("#cityInput").val();
+					var stateValue = $("#stateInput").val();
+					console.log(value);
+					e.preventDefault();
+					var myurl = "https://maps.googleapis.com/maps/api/geocode/json?address="
+					myurl += streetValue;
+					myurl += cityValue;
+					myurl += stateValue;
+					myurl += "&key=AIzaSyBgKzS0IP_eZLj02GsMYPe9cUGjEB1Ugd0";
+					console.log(myurl);
+					$.ajax({
+						url : myurl,
+						dataType : "json",
+						success : function(data) {
+							console.log(data);
+						}
+					})
+				});
+			});
+		</script>
+	</head>
+
+	<body>
+		<h1>Please enter an Address</h1>
+		<form>
+			Street: <input type="text" id="streetInput" value=""><br>
+			City: <input type="text" id="cityInput" value=""><br>
+			State: <input type="text" id="stateInput" value=""><br>
+			<input id="searchButton" type="submit" value="Search">
+		</form>
+	</body>
+</html>
