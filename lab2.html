@@ -1,50 +1,146 @@
 <html>
 	<head>
 		<style>
-
-		</style>
+      	#extraSearchResults {
+       		display:none;
+				font-size: 20px;
+				padding-bottom: 20px;
+       	}
+			body {
+				background-image: url("https://st.depositphotos.com/1011833/1514/i/950/depositphotos_15147795-stock-photo-aged-treasure-map-with-compass.jpg");
+				background-size: 100%;
+				font-family: "Garamond";
+			}
+			form {
+				text-align: center;
+				font-size: 24px;
+			}
+			#resultsOutput {
+				text-align: center;
+				font-size: 20px;
+			}
+			#buttonArea {
+				padding-top: 50px;
+				padding-bottom: 25px;
+			}
+			h1 {
+				text-align: center;
+				padding-top: 50px;
+			}
+			h3 {
+				text-align: center;
+				padding: 25px;
+			}
+			#searchButton {
+				width: 90px;
+				height: 30px;
+				font-size: 20px;
+				font-family: "Garamond";
+			}
+			#hideButton {
+				width: 150px;
+				height: 30px;
+				font-size: 18px;
+				font-family: "Garamond";
+			}
+			#showButton {
+				width: 150px;
+				height: 30px;
+				font-size: 18px;
+				font-family: "Garamond";
+			}
+    </style>
 		
-		<title>Creative Lab - 2</title>
+		<title>Creative Lab 2 - Ben Hansen</title>
 		
 		<script
-			src="http://code.jquery.com/jquery-3.2.1.min.js"
+  			src="http://code.jquery.com/jquery-3.2.1.min.js"
   			integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   			crossorigin="anonymous">
 		</script>
-		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(function() {
+				$("#showButton").click(function(){
+    				$("#extraSearchResults").slideDown();
+				});
+				$("#hideButton").click(function(){
+    				$("#extraSearchResults").slideUp();
+				});
+			});
+		</script>
 		<script>
 			$(document).ready(function() {
 				$("#searchButton").click(function(e) {
 					var streetValue = $("#streetInput").val();
 					var cityValue = $("#cityInput").val();
 					var stateValue = $("#stateInput").val();
-					console.log(value);
+					streetValue = encodeURI(streetValue);
+					cityValue = encodeURI(cityValue);
+					stateValue = encodeURI(stateValue);
 					e.preventDefault();
 					var myurl = "https://maps.googleapis.com/maps/api/geocode/json?address="
-					myurl += streetValue;
-					myurl += cityValue;
+					myurl += streetValue+"+";
+					myurl += cityValue+"+";
 					myurl += stateValue;
 					myurl += "&key=AIzaSyBgKzS0IP_eZLj02GsMYPe9cUGjEB1Ugd0";
-					console.log(myurl);
+					var myurlv2 = "";
 					$.ajax({
 						url : myurl,
 						dataType : "json",
-						success : function(data) {
-							console.log(data);
+						success : function(parsed_json) {
+							var totalAddress = parsed_json['results']['0']['formatted_address'];
+							var county = parsed_json['results']['0']['address_components']['4']['long_name'];
+							var lati = parsed_json['results']['0']['geometry']['location']['lat'];
+							var long = parsed_json['results']['0']['geometry']['location']['lng'];
+							myurlv2 += "https://maps.googleapis.com/maps/api/timezone/json?location=";
+							myurlv2 += lati+",";
+							myurlv2 += long;
+							myurlv2 += "&timestamp=1331161200&key=AIzaSyB5V0W_Dy8_w3CurtOaeXD-GeC3Y6P57io";
+							console.log(myurlv2);
+							var timeZone = "";
+							$.ajax({
+								url : myurlv2,
+								dataType : "json",
+								success : function(parsed_json) {
+									timeZone += parsed_json['timeZoneName'];
+									//console.log(timeZone);
+									var theResults = "Mailing Address:<br>"+totalAddress+"<br><br>"
+															+"County:<br>"+county+"<br><br>"
+															+"Time Zone:<br>"+timeZone+"<br><br>";
+									var theExtraResults = "Latitude:<br>"+lati+"<br><br>"
+																+"Longitude:<br>"+long;
+									$("#searchResults").html(theResults);
+									$("#extraSearchResults").html(theExtraResults);
+								}
+							})
 						}
-					})
+					})					
 				});
 			});
 		</script>
 	</head>
 
 	<body>
-		<h1>Please enter an Address</h1>
+		<h1>Welcome to the Address Information Generator</h1>
+		<h3>Please enter a valid address below</h3>
 		<form>
-			Street: <input type="text" id="streetInput" value=""><br>
-			City: <input type="text" id="cityInput" value=""><br>
+			Street: <input type="text" id="streetInput" value="">
+			City: <input type="text" id="cityInput" value="">
 			State: <input type="text" id="stateInput" value=""><br>
+			<div id="buttonArea">
 			<input id="searchButton" type="submit" value="Search">
+			</div>
 		</form>
+		<div id="resultsOutput">
+		<h2>Address Information:</h2>
+		<div id="searchResults">
+			<p>Please enter a search first</p>
+		</div>
+		<div id="extraSearchResults">
+		</div>
+		<button id="showButton">Show Extra Info</button>
+		<button id="hideButton">Hide Extra Info</button>
+		</div>
 	</body>
 </html>
